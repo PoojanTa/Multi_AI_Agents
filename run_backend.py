@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent / "backend"))
 
 import uvicorn
 from backend.main import app
-from backend.services.mcp_server import MCPServer
+# from backend.services.mcp_server import MCPServer
 from config import Config
 
 # Configure logging

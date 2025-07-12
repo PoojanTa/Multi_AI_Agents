@@ -15,9 +15,7 @@ from backend.models.schemas import (
     AgentTask, AgentResponse, AgentType, TaskStatus, 
     RAGQuery, RAGResult, Workflow, SystemMetrics
 )
-from backend.services.orchestrator import AgentOrchestrator
-from backend.services.rag_service import RAGService
-from backend.services.mcp_server import MCPServer
+from backend.services.simple_rag import SimpleRAGService
 from backend.services.groq_client import GroqClient
 from config import Config
 
@@ -45,9 +43,7 @@ app.add_middleware(
 )
 
 # Global services
-orchestrator = AgentOrchestrator()
-rag_service = RAGService()
-mcp_server = MCPServer()
+rag_service = SimpleRAGService()
 groq_client = GroqClient()
 
 # System metrics storage
@@ -65,13 +61,6 @@ async def startup_event():
     """Initialize services on startup"""
     try:
         logger.info("Starting AI Agent Platform API...")
-        
-        # Initialize orchestrator
-        await orchestrator.initialize()
-        
-        # Start MCP server in background
-        asyncio.create_task(mcp_server.start())
-        
         logger.info("All services initialized successfully")
         
     except Exception as e:

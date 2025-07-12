@@ -3,7 +3,7 @@ import uuid
 from typing import List, Dict, Any, Optional
 import chromadb
 from chromadb.config import Settings
-from backend.utils.embeddings import EmbeddingService
+from backend.utils.simple_embeddings import SimpleEmbeddings
 from backend.utils.document_processor import DocumentProcessor
 from backend.models.schemas import DocumentChunk, RAGQuery, RAGResult
 from config import Config
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class RAGService:
     def __init__(self):
-        self.embedding_service = EmbeddingService()
+        self.embedding_service = SimpleEmbeddings()
         self.document_processor = DocumentProcessor()
         self.chroma_client = None
         self.collection = None
@@ -55,7 +55,7 @@ class RAGService:
             
             # Generate embeddings for chunks
             chunk_texts = [chunk["text"] for chunk in processed_doc["chunks"]]
-            embeddings = self.embedding_service.encode_batch(chunk_texts)
+            embeddings = [self.embedding_service.generate_embedding(text) for text in chunk_texts]
             
             # Prepare data for ChromaDB
             chunk_ids = []
@@ -100,7 +100,7 @@ class RAGService:
         """Search documents using RAG"""
         try:
             # Generate query embedding
-            query_embedding = self.embedding_service.encode_text(query.query)
+            query_embedding = self.embedding_service.generate_embedding(query.query)
             
             # Search in ChromaDB
             results = self.collection.query(
