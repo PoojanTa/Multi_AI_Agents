@@ -110,20 +110,8 @@ async def get_agents_status():
         # Try to get agents from database
         agents = db_service.get_agents()
         
-        agents_data = []
-        for agent in agents:
-            agents_data.append({
-                "id": agent.id,
-                "type": agent.type,
-                "name": agent.name,
-                "status": agent.status,
-                "tasks_completed": agent.tasks_completed,
-                "avg_response_time": agent.avg_response_time,
-                "success_rate": agent.success_rate,
-                "capabilities": agent.capabilities or []
-            })
-        
-        return {"agents": agents_data}
+        # agents is now a list of dictionaries, not ORM objects
+        return {"agents": agents}
         
     except Exception as e:
         logger.error(f"Error getting agents from database: {e}")

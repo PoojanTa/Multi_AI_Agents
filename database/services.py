@@ -31,13 +31,31 @@ class DatabaseService:
         with get_db_session() as session:
             return session.query(Agent).filter(Agent.id == agent_id).first()
     
-    def get_agents(self, status: Optional[str] = None) -> List[Agent]:
+    def get_agents(self, status: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get all agents, optionally filtered by status"""
         with get_db_session() as session:
             query = session.query(Agent)
             if status:
                 query = query.filter(Agent.status == status)
-            return query.all()
+            agents = query.all()
+            
+            # Convert to dictionaries to avoid session issues
+            return [
+                {
+                    "id": agent.id,
+                    "name": agent.name,
+                    "type": agent.type,
+                    "description": agent.description,
+                    "status": agent.status,
+                    "capabilities": agent.capabilities,
+                    "created_at": agent.created_at,
+                    "updated_at": agent.updated_at,
+                    "tasks_completed": agent.tasks_completed,
+                    "success_rate": agent.success_rate,
+                    "avg_response_time": agent.avg_response_time
+                }
+                for agent in agents
+            ]
     
     def update_agent(self, agent_id: str, update_data: Dict[str, Any]) -> Optional[Agent]:
         """Update agent information"""

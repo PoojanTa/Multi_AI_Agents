@@ -2,11 +2,20 @@
 
 ## Overview
 
-This is a comprehensive multi-agent AI platform built with a FastAPI backend and Streamlit frontend. The system orchestrates multiple specialized AI agents (research, analyst, coding, document processing) with RAG (Retrieval-Augmented Generation) capabilities and workflow management. The platform integrates with Groq's API for LLM services and uses ChromaDB for vector storage.
+This is a comprehensive multi-agent AI platform built with a FastAPI backend and Streamlit frontend. The system orchestrates multiple specialized AI agents (research, analyst, coding, document processing) with RAG (Retrieval-Augmented Generation) capabilities, workflow management, and PostgreSQL database integration. The platform provides a complete enterprise-ready solution for AI agent collaboration.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Recent Changes (December 2024)
+
+✓ **Database Integration**: Added PostgreSQL database with SQLAlchemy ORM
+✓ **Database Models**: Created comprehensive models for agents, tasks, documents, workflows, metrics, and users
+✓ **Database Services**: Built service layer for database operations
+✓ **Backend Enhancement**: Updated backend to use real database data
+✓ **Fixed Dependencies**: Resolved plotly, graphviz, and other missing dependencies
+✓ **Error Resolution**: Fixed frontend display errors and SQLAlchemy model conflicts
 
 ## System Architecture
 
@@ -37,12 +46,18 @@ Preferred communication style: Simple, everyday language.
 - **Concurrency**: Semaphore-based limiting of concurrent tasks
 - **Agent Types**: Research, Analyst, Coding, Document processing agents
 
-### 2. RAG Service (`backend/services/rag_service.py`)
+### 2. Database Layer (`database/`)
+- **Models**: SQLAlchemy models for agents, tasks, documents, workflows, metrics, users
+- **Connection**: PostgreSQL connection management with session handling
+- **Services**: Database service layer with CRUD operations and analytics
+- **Migration**: Automatic table creation and default data initialization
+
+### 3. RAG Service (`backend/services/rag_service.py` & `simple_rag.py`)
 - **Purpose**: Handles document ingestion, vectorization, and retrieval
-- **Vector Database**: ChromaDB for persistent vector storage
+- **Storage**: File-based storage with JSON for simple deployment
 - **Document Processing**: Support for PDF, DOCX, and text files
-- **Embedding Service**: Sentence transformers for text vectorization
-- **Search**: Semantic search with configurable top-k results
+- **Embedding Service**: Simple hash-based embeddings for lightweight operation
+- **Search**: Similarity search with configurable top-k results
 
 ### 3. Groq Client (`backend/services/groq_client.py`)
 - **Purpose**: Interface to Groq's LLM API
@@ -98,9 +113,11 @@ Preferred communication style: Simple, everyday language.
 ### Python Libraries
 - **FastAPI**: Web framework for backend API
 - **Streamlit**: Frontend framework for interactive dashboards
+- **SQLAlchemy**: Database ORM for PostgreSQL integration
+- **Psycopg2**: PostgreSQL database adapter
+- **Alembic**: Database migration tool
 - **Pydantic**: Data validation and serialization
 - **aiohttp**: Async HTTP client for API calls
-- **sentence-transformers**: Text embedding generation
 - **plotly**: Interactive visualizations
 - **pandas**: Data manipulation and analysis
 
