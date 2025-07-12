@@ -110,7 +110,8 @@ class AIAgentPlatform:
         try:
             response = requests.get(f"{self.backend_url}/agents/status", timeout=5)
             if response.status_code == 200:
-                return response.json()
+                data = response.json()
+                return data.get('agents', []) if isinstance(data, dict) else data
             else:
                 return []
         except:

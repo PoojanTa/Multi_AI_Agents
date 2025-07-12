@@ -15,6 +15,8 @@ from datetime import datetime
 import os
 import tempfile
 import json
+from database.connection import init_database, check_database_connection
+from database.services import db_service
 
 # Configure logging
 logging.basicConfig(
@@ -62,6 +64,14 @@ async def startup_event():
     """Initialize services on startup"""
     try:
         logger.info("Starting AI Agent Platform API...")
+        
+        # Initialize database
+        if check_database_connection():
+            init_database()
+            logger.info("Database initialized successfully")
+        else:
+            logger.warning("Database connection failed - using fallback mode")
+        
         logger.info("All services initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize services: {e}")
@@ -96,46 +106,72 @@ async def get_system_metrics():
 @app.get("/agents/status")
 async def get_agents_status():
     """Get status of all agents"""
-    agents = [
-        {
-            "id": "research_agent",
-            "type": "research",
-            "name": "Research Agent",
-            "status": "active",
-            "tasks_completed": 15,
-            "avg_response_time": 2.3,
-            "capabilities": ["web_search", "data_gathering", "fact_checking"]
-        },
-        {
-            "id": "analyst_agent",
-            "type": "analyst",
-            "name": "Analyst Agent",
-            "status": "active",
-            "tasks_completed": 8,
-            "avg_response_time": 3.1,
-            "capabilities": ["data_analysis", "pattern_recognition", "insights"]
-        },
-        {
-            "id": "coding_agent",
-            "type": "coding",
-            "name": "Coding Agent",
-            "status": "active",
-            "tasks_completed": 12,
-            "avg_response_time": 4.5,
-            "capabilities": ["code_generation", "debugging", "testing"]
-        },
-        {
-            "id": "document_agent",
-            "type": "document",
-            "name": "Document Agent",
-            "status": "active",
-            "tasks_completed": 6,
-            "avg_response_time": 2.8,
-            "capabilities": ["document_processing", "text_extraction", "summarization"]
-        }
-    ]
-    
-    return {"agents": agents}
+    try:
+        # Try to get agents from database
+        agents = db_service.get_agents()
+        
+        agents_data = []
+        for agent in agents:
+            agents_data.append({
+                "id": agent.id,
+                "type": agent.type,
+                "name": agent.name,
+                "status": agent.status,
+                "tasks_completed": agent.tasks_completed,
+                "avg_response_time": agent.avg_response_time,
+                "success_rate": agent.success_rate,
+                "capabilities": agent.capabilities or []
+            })
+        
+        return {"agents": agents_data}
+        
+    except Exception as e:
+        logger.error(f"Error getting agents from database: {e}")
+        # Fallback to static data
+        agents = [
+            {
+                "id": "research_agent",
+                "type": "research",
+                "name": "Research Agent",
+                "status": "active",
+                "tasks_completed": 15,
+                "avg_response_time": 2.3,
+                "success_rate": 0.95,
+                "capabilities": ["web_search", "data_gathering", "fact_checking"]
+            },
+            {
+                "id": "analyst_agent",
+                "type": "analyst",
+                "name": "Analyst Agent",
+                "status": "active",
+                "tasks_completed": 8,
+                "avg_response_time": 3.1,
+                "success_rate": 0.92,
+                "capabilities": ["data_analysis", "pattern_recognition", "insights"]
+            },
+            {
+                "id": "coding_agent",
+                "type": "coding",
+                "name": "Coding Agent",
+                "status": "active",
+                "tasks_completed": 12,
+                "avg_response_time": 4.5,
+                "success_rate": 0.88,
+                "capabilities": ["code_generation", "debugging", "testing"]
+            },
+            {
+                "id": "document_agent",
+                "type": "document",
+                "name": "Document Agent",
+                "status": "active",
+                "tasks_completed": 6,
+                "avg_response_time": 2.8,
+                "success_rate": 0.93,
+                "capabilities": ["document_processing", "text_extraction", "summarization"]
+            }
+        ]
+        
+        return {"agents": agents}
 
 @app.get("/agents/{agent_id}")
 async def get_agent_info(agent_id: str):
