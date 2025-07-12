@@ -1,0 +1,36 @@
+# AI Agent Platform - Project Requirements
+# Core web frameworks
+fastapi>=0.116.1
+streamlit>=1.46.1
+uvicorn>=0.35.0
+
+# Database
+sqlalchemy>=2.0.41
+psycopg2-binary>=2.9.10
+alembic>=1.16.4
+
+# Data processing and analysis
+pandas>=2.3.1
+numpy>=2.3.1
+plotly>=6.2.0
+
+# HTTP client and API
+aiohttp>=3.12.14
+requests>=2.32.4
+python-multipart>=0.0.20
+
+# Data validation
+pydantic>=2.11.7
+
+# Document processing
+pypdf2>=3.0.1
+python-docx>=1.2.0
+
+# Natural language processing
+nltk>=3.9.1
+
+# Visualization
+graphviz>=0.21
+
+# Note: This project requires Python 3.11 or higher
+# Install with: pip install -r project_requirements.txt
